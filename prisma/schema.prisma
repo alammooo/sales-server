@@ -1,0 +1,196 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  MASTER
+  ADMIN
+  SALES
+}
+
+enum Status {
+  CONFIRMED
+  REJECTED
+  PENDING
+}
+
+model User {
+  id          String  @id @default(cuid())
+  username    String
+  password    String
+  phoneNumber String?
+  name        String?
+  image       String?
+  role        Role
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Session  Session[]
+  Account  Account[]
+  Sales    Sales[]
+  Income   Income[]
+  Wallet   Wallet?
+  Withdraw Withdraw[]
+}
+
+model Wallet {
+  id      String @id @default(cuid())
+  balance Float  @db.Real
+  total   Float  @db.Real
+  userId  String @unique
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Income   Income[]
+  Withdraw Withdraw[]
+}
+
+model Withdraw {
+  id             String @id @default(cuid())
+  accountNumber  String
+  accountName    String
+  transferAmount Float  @db.Real
+  walletId       String
+  userId         String
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Income {
+  id       String @id @default(cuid())
+  userId   String
+  salesId  String
+  amount   Float  @db.Real
+  walletId String
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  sales  Sales  @relation(fields: [salesId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String  @unique
+  providerAccountId String  @unique
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([identifier, token])
+}
+
+model RedeemCode {
+  id   String @id @default(cuid())
+  code String @unique
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Sales Sales[]
+}
+
+model Course {
+  id   String @id @default(cuid())
+  name String @unique
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Sales Sales[]
+}
+
+model Period {
+  id        String   @id @default(cuid())
+  startDate DateTime
+  endDate   DateTime
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Sales Sales[]
+}
+
+model Sales {
+  id             String @id @default(cuid())
+  clientName     String
+  clientEmail    String
+  courseId       String
+  periodId       String
+  clientPassword String
+  price          Float  @db.Real
+  status         Status @default(PENDING)
+  userId         String
+  redeemId       String
+
+  course     Course     @relation(fields: [courseId], references: [id])
+  period     Period     @relation(fields: [periodId], references: [id])
+  redeemCode RedeemCode @relation(fields: [redeemId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  Income Income[]
+}

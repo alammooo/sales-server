@@ -1,0 +1,164 @@
+// import { number, object, string } from 'yup'
+// import { publicProcedure, router } from './trpc'
+// import { db } from '@/lib/db'
+// import { PatientSchema } from '@/schemas/patient'
+// import { SubDistrict } from '@/types/subdistrict.types'
+// import { TRPCError } from '@trpc/server'
+// import { patientRouter } from '@/server/patient'
+
+// export const appRouter = router({
+//   test: publicProcedure.query(async () => {
+//     return ['ASDASDSDDASD']
+//   }),
+//   lastRMNumber: publicProcedure.query(async () => {
+//     const result = await db.patient.findMany({
+//       take: 1,
+//       orderBy: {
+//         id: 'desc',
+//       },
+//       select: {
+//         id: true,
+//       },
+//     })
+
+//     const data = result.pop()
+//     if (!data?.id) {
+//       return '000001'
+//     }
+//     if (data?.id) {
+//       const lastId = data.id + 1
+//       return String(lastId).padStart(6, '0')
+//     }
+
+//     return 'Error fetching data'
+//   }),
+
+//   patient: patientRouter,
+
+//   getCountry: publicProcedure.query(async () => {
+//     return db.country.findMany()
+//   }),
+
+//   getProvince: publicProcedure.query(async () => {
+//     return db.province.findMany()
+//   }),
+
+//   getCity: publicProcedure
+//     .input(
+//       object({
+//         provinceId: number(),
+//       })
+//     )
+//     .query(async ({ input }) => {
+//       return db.city.findMany({
+//         where: {
+//           provinceId: input.provinceId,
+//         },
+//       })
+//     }),
+
+//   getDistrict: publicProcedure
+//     .input(
+//       object({
+//         cityId: number(),
+//       })
+//     )
+//     .query(async ({ input }) => {
+//       return db.district.findMany({
+//         where: {
+//           cityId: input.cityId,
+//         },
+//         take: 100,
+//       })
+//     }),
+
+//   getOccupation: publicProcedure.query(async () => {
+//     return db.occupation.findMany({
+//       take: 100,
+//     })
+//   }),
+
+//   getSubDistrict: publicProcedure
+//     .input(
+//       object({
+//         districtId: number(),
+//       })
+//     )
+//     .query(async ({ input }): Promise<SubDistrict[]> => {
+//       const result = await db.subDistrict.findMany({
+//         where: {
+//           districtId: input.districtId,
+//         },
+//         take: 100,
+//       })
+
+//       const stringfyResult = JSON.stringify(
+//         result,
+//         (key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
+//       )
+
+//       return JSON.parse(stringfyResult)
+//     }),
+// })
+
+// // Export type router type signature,
+// // NOT the router itself.
+// export type AppRouter = typeof appRouter
+
+
+// import { db } from '@/lib/db'
+// import { PatientSchema } from '@/schemas/patient'
+// import { publicProcedure, router } from '@/trpc/trpc'
+// import { number, object } from 'yup'
+
+// export const patientRouter = router({
+//   create: publicProcedure.input(PatientSchema).mutation(async ({ input }) => {
+//     try {
+//       const result = await db.patient.create({
+//         data: input,
+//       })
+//       return result
+//     } catch (error) {
+//       throw error
+//     }
+//   }),
+//   update: publicProcedure.input(PatientSchema).mutation(async ({ input }) => {
+//     try {
+//       const result = await db.patient.update({
+//         data: { ...input, subDistrictId: BigInt(input.subDistrictId || 0) },
+//         where: {
+//           MRNumber: input.MRNumber,
+//         },
+//       })
+
+//       const stringfyResult = JSON.stringify(
+//         result,
+//         (key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
+//       )
+
+//       return JSON.parse(stringfyResult)
+//     } catch (error) {
+//       throw error
+//     }
+//   }),
+//   getById: publicProcedure
+//     .input(
+//       object().shape({
+//         id: number(),
+//       })
+//     )
+//     .query(async ({ input }) => {
+//       const result = await db.patient.findFirst({
+//         where: {
+//           id: input.id,
+//         },
+//       })
+
+//       const stringfyResult = JSON.stringify(
+//         result,
+//         (key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
+//       )
+
+//       return JSON.parse(stringfyResult)
+//     }),
+// })
