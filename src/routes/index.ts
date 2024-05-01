@@ -10,6 +10,7 @@ import roleRouter from './role.routes'
 import userRouter from './user.routes'
 import courseRouter from './course.routes'
 import salesRouter from './sales.routes'
+import periodRouter from './period.routes'
 
 const router = express.Router()
 
@@ -23,5 +24,6 @@ router.use('/global', globalRoute)
 router.use('/role', roleRouter)
 router.use('/sales', salesRouter)
 router.use('/course', courseRouter)
+router.use('/period', periodRouter)
 
 export default router

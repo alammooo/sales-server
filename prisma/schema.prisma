@@ -162,6 +162,7 @@ model Course {
 model Period {
   id        String   @id @default(cuid())
   name      String
+  details   String
   startDate DateTime
   endDate   DateTime
 

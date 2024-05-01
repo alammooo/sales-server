@@ -1,22 +1,36 @@
+import dayjs from 'dayjs'
+
 import {
   createService,
   deleteService,
   getAllService,
   getByIdService,
   updateService,
-} from '@/services/course.services'
+} from '@/services/period.services'
 import { ExpressFc } from '@/types'
 import {
   createValidator,
   deleteValidator,
   findValidator,
   updateValidator,
-} from '@/validators/course.validators'
+} from '@/validators/period.validators'
+
+type DateRange = {
+  startDate: Date
+  endDate: Date
+  details: string
+}
+
+function createNameFromDateRange({ startDate, endDate, details }: DateRange): string {
+  const formattedStartDate = dayjs(startDate).format('YYYY-MM-DD')
+  const formattedEndDate = dayjs(endDate).format('YYYY-MM-DD')
+  return `${formattedStartDate} - ${formattedEndDate} (${details})`
+}
 
 export const getAllController: ExpressFc = async (req, res, next) => {
   try {
     const result = await getAllService()
-    res.status(200).json({ message: 'success get all course', data: result })
+    res.status(200).json({ message: 'success get all period', data: result })
   } catch (error) {
     next(error)
   }
@@ -26,7 +40,7 @@ export const getByIdController: ExpressFc = async (req, res, next) => {
   try {
     const { params } = await findValidator.validate(req)
     const result = await getByIdService(params)
-    res.status(201).json({ message: 'success find course', data: result })
+    res.status(201).json({ message: 'success find period', data: result })
   } catch (error) {
     next(error)
   }
@@ -34,10 +48,15 @@ export const getByIdController: ExpressFc = async (req, res, next) => {
 
 export const createController: ExpressFc = async (req, res, next) => {
   try {
-    console.log(req.body, "HALLO BODYY✅✅✅")
+    console.log({ body: req.body }, '✅✅✅✅✅✅✅✅')
     const { body } = await createValidator.validate(req)
-    const result = await createService(body)
-    res.status(201).json({ message: 'success create course', data: result })
+    const name = createNameFromDateRange({
+      startDate: body.startDate,
+      endDate: body.endDate,
+      details: body.details,
+    })
+    const result = await createService({ ...body, name })
+    res.status(201).json({ message: 'success create period', data: result })
   } catch (error) {
     next(error)
   }
@@ -50,7 +69,7 @@ export const updateController: ExpressFc = async (req, res, next) => {
       id: params.id,
       payload: body,
     })
-    res.status(204).json({ message: 'success delete course', data: result })
+    res.status(204).json({ message: 'success delete period', data: result })
   } catch (error) {
     next(error)
   }
@@ -62,7 +81,7 @@ export const deleteController: ExpressFc = async (req, res, next) => {
     const result = await deleteService({
       id: params.id,
     })
-    res.status(204).json({ message: 'success delete course', data: result })
+    res.status(204).json({ message: 'success delete period', data: result })
   } catch (error) {
     next(error)
   }
