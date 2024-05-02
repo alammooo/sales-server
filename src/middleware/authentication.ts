@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
 import prisma from '@/config/prisma'
+import { Role } from '@/enum/Role'
 
 import ErrorHandler from './error-handler/errorHandler'
 
@@ -9,13 +10,11 @@ declare module 'express-serve-static-core' {
   interface Request {
     user: {
       id: string
-      roleId?: number | null
+      role: Role | null
       username: string
       phoneNumber?: string | null
-      isAdmin: boolean
       name: string | null
-      email: string | null
-      profilePicture: string | null
+      image: string | null
     }
   }
 }
@@ -28,17 +27,14 @@ const authentication = async (req: Request, res: Response, next: NextFunction) =
     const { userId } = jwt.verify(accessToken, process.env.JWT_SECRET) as { userId: string }
     const user = await prisma.user.findFirstOrThrow({
       where: { id: userId },
-      include: { role: { select: { name: true } } },
     })
     req.user = {
       id: user.id,
-      roleId: user.roleId,
+      role: user.role,
       username: user.username,
       phoneNumber: user.phoneNumber,
-      isAdmin: user.role?.name === 'admin',
       name: user.name,
-      email: user.email,
-      profilePicture: user.profilePicture,
+      image: user.image,
     }
     next()
   } catch (error) {

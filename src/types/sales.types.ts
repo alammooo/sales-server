@@ -1,4 +1,4 @@
-import { Status } from "@/enum/status"
+import { Status } from '@/enum/status'
 
 export type Sales = {
   id: string
@@ -16,11 +16,12 @@ export type Sales = {
   deletedAt: Date | null
 }
 
-export type CreateService = Omit<Sales, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
+export type CreateService = Omit<Sales, 'status' | 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
 
 export type UpdateService = {
   payload: Partial<CreateService>
   id: string
+  status: Status
 }
 
 export type DeleteService = {

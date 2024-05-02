@@ -7,7 +7,6 @@ import { loginSchema, registerSchema } from '@/validators/auth.validators'
 
 export const login: ExpressFc = async (req, res, next) => {
   try {
-    console.log(req.body, "AUTH🟩🟩🟩🟩🟩🟩")
     const { body } = await loginSchema.validate(req)
     const user = await getUserByUsername(body.username)
     if (!user) throw new ErrorHandler(401, 'Username/passoword salah')
