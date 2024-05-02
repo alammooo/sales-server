@@ -1,3 +1,5 @@
+import { Role } from "@/enum/Role"
+
 export type User = {
   id: number
   username: string
@@ -30,7 +32,7 @@ export type Register = {
   username: string
   password: string
   phoneNumber?: string
-  name?: string
-  email: string
-  profilePicture?: string
+  name: string
+  image?: string
+  role?: Role
 }

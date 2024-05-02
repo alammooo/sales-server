@@ -7,6 +7,7 @@ import authentication from '@/middleware/authentication';
 const authRouter = express.Router();
 
 authRouter.post('/login', login);
-authRouter.post('/register', authentication, adminOnly, register);
+// authRouter.post('/register', authentication, adminOnly, register);
+authRouter.post('/register', register);
 
 export default authRouter;

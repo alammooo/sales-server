@@ -1,7 +1,4 @@
-import { Course } from '@prisma/client'
 import { number, object, string } from 'yup'
-
-import { STATUS } from '@/enum/status'
 
 export const createValidator = object().shape({
   body: object().shape({
